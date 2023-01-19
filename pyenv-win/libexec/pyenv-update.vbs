@@ -236,6 +236,43 @@ Sub SymanticQuickSort(arr, arrMin, arrMax)
     If arrFrst < arrMax  Then SymanticQuickSort arr, arrFrst, arrMax
 End Sub
 
+' Prune all but the latest minor versions
+Function SymanticPruneToLatestMinor(arr)
+    Dim latestVersions
+    Set latestVersions = CreateObject("System.Collections.ArrayList")
+
+    Dim previous
+    Dim current
+    Dim previousVersion
+    Dim currentVersion
+
+    Dim i
+    For i = 0 to UBound(arr)
+        current = arr(i)
+        currentVersion = current(SFV_Version)
+
+        If UBound(currentVersion) >= VRX_Release - 1 Then
+        If currentVersion(VRX_Release) = "" Then
+            ' Skip prereleases
+            If Not IsEmpty(previousVersion) Then
+            If CLng(currentVersion(VRX_Minor)) <> CLng(previousVersion(VRX_Minor)) Then
+                ' Minor version changed, so store the previous version as latest
+                latestVersions.Add previous
+            End If
+            End If
+
+            previous = current
+            previousVersion = currentVersion
+        End If
+        End If
+    Next
+
+    ' Don't forget the last version!
+    latestVersions.Add previous
+
+    SymanticPruneToLatest = CollectionToArray(latestVersions)
+End Function
+
 Sub main(arg)
     Dim optIgnore
     optIgnore = False
@@ -330,6 +367,12 @@ Sub main(arg)
     SymanticQuickSort installArr, LBound(installArr), UBound(installArr)
     SaveVersionsXML strDBFile, installArr
     WScript.Echo ":: [Info] ::  Scanned "& pageCount &" pages and found "& installers2.Count &" installers."
+
+    ' Prune sorted versions array to only latest minor versions
+    Dim latestVersionsArr
+    latestVersionsArr = SymanticPruneToLatestMinor(installArr)
+    SaveVersionsXML strLatestDBFile, latestVersionsArr
+
 
 End Sub
 

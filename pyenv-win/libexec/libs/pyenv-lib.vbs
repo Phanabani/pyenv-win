@@ -39,6 +39,7 @@ Dim strDirLibs
 Dim strDirShims
 Dim strDirWiX
 Dim strDBFile
+Dim strLatestDBFile
 Dim strVerFile
 strCurrent   = objfs.GetAbsolutePathName(".")
 strPyenvHome = objfs.getParentFolderName(objfs.getParentFolderName(WScript.ScriptFullName))
@@ -49,6 +50,7 @@ strDirLibs   = strPyenvHome & "\libexec"
 strDirShims  = strPyenvHome & "\shims"
 strDirWiX    = strPyenvHome & "\bin\WiX"
 strDBFile    = strPyenvHome & "\.versions_cache.xml"
+strLatestDBFile = strPyenvHome & "\latest_tags.xml"
 strVerFile   = "\.python-version"
 
 Function GetCurrentVersionsGlobal()
